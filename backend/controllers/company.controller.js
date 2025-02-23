@@ -14,10 +14,10 @@ export const registerCompany = async (req , res) => {
       }
       const newCompany = new Company({
         name
-      })
+      }) 
       await newCompany.save();
       
-    res.status(201).json({ message: "Company created successfully", company: newCompany });
+    res.status(201).json({ message: "Company created successfully", companyId: newCompany._id });
     } catch (error) {
     res.status(500).json({ message: "Error creating company", error: error.message });
     }
@@ -26,13 +26,34 @@ export const registerCompany = async (req , res) => {
 
 export const updateCompany = async (req, res) => {
   try {
-    const updatedCompany = await Company.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const {name, budgetId, expenseId, employeeId} = req.body;
 
-    if (!updatedCompany) {
+    const companyId = req.params.id;
+
+    const company = await Company.findById(companyId);
+    if (!company) {
       return res.status(404).json({ message: "Company not found" });
     }
+    if (name) company.name = name;
 
-    res.status(200).json({ message: "Company updated successfully", company: updatedCompany });
+    // Add new budgets without replacing existing ones
+    if (budgetId) {
+      company.budgets = [...new Set([...company.budgets, budgetId])];
+    }
+
+    // Add new expenses without replacing existing ones
+    if (expenseId) {
+      company.expenses = [...new Set([...company.expenses, expenseId])];
+    }
+
+    // Add new employees without replacing existing ones
+    if (employeeId) {
+      company.employees = [...new Set([...company.employees, employeeId])];
+    }
+
+    await company.save();
+
+    res.status(200).json({ message: "Company updated successfully", company : company });
   } catch (error) {
     res.status(500).json({ message: "Error updating company", error: error.message });
   }
@@ -62,6 +83,6 @@ export const getCompanyById = async (req, res) => {
 
     res.status(200).json(company);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching company", error: error.message });
+    res.status(400).json({ message: "Error fetching company", error: error.message });
   }
 }

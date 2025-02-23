@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config'
 import connectDB from './config/db.js'
+import adminRoutes from './routes/admin.routes.js';
 import userRoutes from './routes/user.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import budgetRoutes from './routes/budget.routes.js';
@@ -19,11 +20,12 @@ app.use(express.urlencoded());
 
 
 // Routes
+app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use('/api/v1/company', companyRoutes);
-app.use("/api/expenses", expenseRoutes);
-app.use("/api/budget", budgetRoutes);
-app.use("/api/category", categoryRoutes);
+app.use("/api/v1/expense", expenseRoutes);
+app.use("/api/v1/budget", budgetRoutes);
+app.use("/api/v1/category", categoryRoutes);
 
 // app.use("/api/wolfram", wolframRoutes);
 
