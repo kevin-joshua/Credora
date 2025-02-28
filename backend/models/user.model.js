@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ["Admin", "Employee"], default: "Employee" },
   company: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
-  createdAt: { type: Date, default: Date.now }
-});
+ 
+}, {timestamps: true});
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

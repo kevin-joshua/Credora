@@ -4,12 +4,15 @@ import {
   registerCompany, 
   getCompanyById, 
   updateCompany, 
-  deleteCompany 
+  deleteCompany, 
+  getAllCompanyName
 } from "../controllers/company.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { adminAuth } from "../middleware/adminAuth.middleware.js";
 
 const router = Router();
+
+router.get("/all", getAllCompanyName);
 
 router.post("/create", adminAuth, registerCompany); // ✅ Create a company
 

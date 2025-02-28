@@ -1,23 +1,29 @@
+import Budget from "../models/budget.model.js";
 import Company from "../models/company.model.js";
+import Expense from "../models/expense.model.js";
+import User from "../models/user.model.js";
 
 
 
 export const registerCompany = async (req , res) => {
-    const {name} = req.body;
+    const {name, employeeId} = req.body;
     try{
       if(!name) return res.status(400).json({message: "name is required"});
 
       const existingCompany = await Company.findOne({name});
-
+      const employee = await User.findById(employeeId)
       if (existingCompany) {
-        return res.status(400).json({ message: "Company already exists." });
+        return res.status(402).json({ error: "Company already exists." });
       }
       const newCompany = new Company({
         name
-      }) 
+      })   
+     
       await newCompany.save();
-      
-    res.status(201).json({ message: "Company created successfully", companyId: newCompany._id });
+      await Company.updateOne({ _id: newCompany._id }, { $push: { employees: employeeId } });
+      await User.updateOne({ _id: employeeId }, { $push: { company: newCompany._id } });
+
+    res.status(201).json({ message: "Company created successfully", companyId: newCompany });
     } catch (error) {
     res.status(500).json({ message: "Error creating company", error: error.message });
     }
@@ -38,17 +44,22 @@ export const updateCompany = async (req, res) => {
 
     // Add new budgets without replacing existing ones
     if (budgetId) {
-      company.budgets = [...new Set([...company.budgets, budgetId])];
+      await Company.updateOne({ _id: company._id }, { $push: { budgets: budgetId } });
+      await Budget.updateOne({ _id: budgetId }, { $push: { company: company._id } });
+    
     }
 
     // Add new expenses without replacing existing ones
     if (expenseId) {
-      company.expenses = [...new Set([...company.expenses, expenseId])];
+      await Company.updateOne({ id: company._id}, { $push: {expenses: expenseId}})
+      await Expense.updateOne({ id: expenseId}, { $push: {company: company._id}})
+
     }
 
     // Add new employees without replacing existing ones
     if (employeeId) {
-      company.employees = [...new Set([...company.employees, employeeId])];
+      await Company.updateOne({ id: company._id}, { $push: {employee: employeeId}});
+      await User.updateOne({ id: employeeId}, { $push : {company: company._id}});
     }
 
     await company.save();
@@ -83,6 +94,16 @@ export const getCompanyById = async (req, res) => {
 
     res.status(200).json(company);
   } catch (error) {
+    res.status(400).json({ message: "Error fetching company", error: error.message });
+  }
+}
+
+export const getAllCompanyName = async (req, res) => {
+  try {
+    const companies = await Company.find({}, "name");
+    const companyNames = companies.map(company => company.name);
+    res.status(200).json(companyNames);
+  }catch (error) {
     res.status(400).json({ message: "Error fetching company", error: error.message });
   }
 }

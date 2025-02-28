@@ -10,9 +10,9 @@ export const registerAdmin = async (req, res) => {
   const role = "Admin"
   try{
     const user = await User.findOne({ email }).select("-password");
-    if(user) return res.status(400).json({message: "User already exists"});
+    if(user) return res.status(409).json({message: "User already exists"});
 
-    const newUser = await User.create({name, email, password, role, company});
+    const newUser = await User.create({name, email, password, role});
     await newUser.save();
 
   
@@ -38,8 +38,14 @@ export const loginAdmin = async (req, res) => {
     }
     const token = await generateAdminToken(user._id);
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      sameSite: "strict", // Protects against CSRF
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiry
+    });
    
-    res.json({ message: "Login successfull", token : token, user: user.email});
+    res.status(201).json({ message: "Login successfull", user: user});
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
   }
@@ -96,14 +102,15 @@ export const getAdminProfile = async (req, res) => {
 
 export const registerUser = async (req, res) => {
   const {name, email, password, role, company} = req.body;
-  
+  const companyId = await Company.findOne({name: company}).select("_id")
   try{
     const user = await User.findOne({email});
-    if(user) return res.status(400).json({message: "User already exists"});
+    if(user) return res.status(409).json({message: "User already exists"});
 
-    const newUser = await User.create({name, email, password, role, company});
+    const newUser = await User.create({name, email, password, role, company: companyId._id});
     await newUser.save();
 
+    await Company.updateOne({ id: companyId}, { $push: {employee: newUser._id}});
     
 
 
@@ -123,7 +130,17 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
     const token = await generateToken(user._id);
-    res.json({ message: "Login successfull", token : token, user: user});
+
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      sameSite: "strict", // Protects against CSRF
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiry
+    });
+
+    
+    res.status(201).json({ message: "Login successfull", user: user});
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
   }
