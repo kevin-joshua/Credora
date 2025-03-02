@@ -1,6 +1,6 @@
-﻿### **📌 Project Overview: FinOptima - Business Cost Planner & Advisor**  
+﻿### **📌 Project Overview: Credora - Business Cost Planner & Advisor**  
 
-**FinOptima** is a **MERN-stack**-based financial management platform designed to help **small to medium-sized businesses** efficiently track their expenses, budget allocations, and financial insights. It provides cost tracking, real-time expense analysis, and personalized financial recommendations.  
+**Credora** is a **MERN-stack**-based financial management platform designed to help **small to medium-sized businesses** efficiently track their expenses, budget allocations, and financial insights. It provides cost tracking, real-time expense analysis, and personalized financial recommendations.  
 
 ---
 
