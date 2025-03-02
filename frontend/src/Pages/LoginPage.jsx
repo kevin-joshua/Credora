@@ -21,7 +21,7 @@ const LoginPage = () => {
    
     try {
       const response = await login(data.email, data.password, userType.toLowerCase());
-      console.log(response.status);
+      console.log(response.statusCode);
       if (response.status === 201) {
         setMessageType("success");
         setMessage("Login successful!");

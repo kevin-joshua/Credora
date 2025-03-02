@@ -1,23 +1,32 @@
-
 import { NavLink } from "react-router-dom";
-
-
 
 const Header = () => {
 
   return (
-    <div className="flex flex-row justify-center shadow-2xl p-1  shadow-indigo-700">
-      <div>
-      <NavLink to='/login'>
-        <button className="bg-white text-lg text-indigo-700 font-semibold shadow-lg shadow-gray-500 p-2 pl-5 pr-5 rounded-lg m-2 hover:-translate-y-1 hover:scale-110 ease-in-out transition delay-75" >Sign In</button>
-      </NavLink>
-      <NavLink to='/userSelect'>
-        <button className="bg-indigo-700 text-lg text-white font-semibold shadow-lg shadow-indigo-500 p-2 rounded-md m-2 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 transition delay-75"
-         >Get Started</button>
-      </NavLink>
-      </div>
-     
-    </div>
+    <div className="flex items-center justify-between shadow-2xs border-b border-gray-300 p-3">
+  {/* Left Side: Logo */}
+  <div className="flex flex-1 items-center space-x-2">
+  <img src="./src/assets/Cashflow.png" className="w-12 h-12 rounded-xl" alt="Cashflow Logo" />
+  <h2 className="text-xl font-bold text-indigo-900">Credora</h2>
+</div>
+
+
+  {/* Navigation Links - Centered */}
+  <div className="flex gap-6 justify-center items-center flex-1">
+    <NavLink to="/dashboard" className={({isActive}) => isActive ? `rounded-2xl bg-indigo-200 pl-3 pr-3 p-1 font-semibold`: `hover:bg-indigo-200  pl-3 pr-3 p-1 rounded-2xl`}>Dashboard</NavLink>
+    <NavLink to="/transactions" className={({isActive}) => isActive ? `rounded-2xl bg-indigo-200 pl-3 pr-3 p-1 font-semibold`: `hover:bg-indigo-200  pl-3 pr-3 p-1 rounded-2xl`}>Revenue</NavLink>
+    <NavLink to="/budget" className={({isActive}) => isActive ? `rounded-2xl bg-indigo-200 pl-3 pr-3 p-1 font-semibold`: `hover:bg-indigo-200  pl-3 pr-3 p-1 rounded-2xl`}>Budgets</NavLink>
+    <NavLink to="/expenses" className={({isActive}) => isActive ? `rounded-2xl bg-indigo-200 pl-3 pr-3 p-1 font-semibold`: `hover:bg-indigo-200  pl-3 pr-3 p-1 rounded-2xl`}>Expenses</NavLink>
+    <NavLink to="/insights" className={({isActive}) => isActive ? `rounded-2xl bg-indigo-200 pl-3 pr-3 p-1 font-semibold`: `hover:bg-indigo-200  pl-3 pr-3 p-1 rounded-2xl`}>Invoices</NavLink>
+    <NavLink to="/invoices" className={({isActive}) => isActive ? `rounded-2xl bg-indigo-200 pl-3 pr-3 p-1 font-semibold`: `hover:bg-indigo-200  pl-3 pr-3 p-1 rounded-2xl`}>Reports</NavLink>
+    
+    <div className="bg-indigo-200 pt-2 pb-2 pl-4 pr-4 rounded-2xl hover:bg-indigo-400">
+  <i className="fa-solid fa-user"></i>
+  </div>
+  </div>
+  
+</div>
+
   )
 }
 

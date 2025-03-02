@@ -39,7 +39,7 @@ const onSubmit = async (data) => {
       setMessageType("success");
       setMessage("Signup successful!");
       
-
+      console.log(response.data.user);
       setTimeout(() => {
           navigate(`/login`)
         
@@ -95,12 +95,13 @@ const onSubmit = async (data) => {
 {userType === "Employee" && (<div>
         <label className='text-lg font-medium'>Company</label>
       <select {...register("company", {
-      })} defaultValue=""  className="w-full p-2 border rounded" onChange={(e) => {setValue("company",e.target.value); }}>
+      })} defaultValue=""  className="w-full p-2 border rounded-lg" onChange={(e) => {setValue("company",e.target.value); }}>
+        <option value="" disabled>Select Company</option>
       {companies.map((name, index) => (
         <option key={index} value={name}>{name}</option>
       ))}
       </select>
-</div>)}
+</div>)} 
 <div>
         <label className='text-lg font-medium'>Role</label>
       <input {...register("role", {

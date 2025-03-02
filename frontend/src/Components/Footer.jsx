@@ -2,7 +2,7 @@
 
 const Footer = () => {
   return (
-    <div className="bg-indigo-600 text-white text-center p-5">Credora @2025 All rights reserved</div>
+    <div className="bg-indigo-600 text-white text-center p-5"><p>&copy; {new Date().getFullYear()} Credora. All rights reserved.</p></div>
   )
 }
 

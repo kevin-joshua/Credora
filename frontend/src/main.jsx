@@ -2,20 +2,23 @@
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider} from 'react-router-dom';
-import Layout from './Pages/Layout.jsx';
 import UserSelect from './Pages/UserSelect.jsx';
 import NotFoundPage from './Pages/NotFoundPage.jsx'
 import SignUp from './Pages/SignUp.jsx';
 import LoginPage from './Pages/LoginPage.jsx';
 import CreateCompany from './Pages/CreateCompany.jsx';
 import { AuthProvider } from './Context/AuthContext.jsx';
+import Dashboard from './Pages/Dashboard.jsx';
+import LandingPage from './Pages/LandingPage.jsx';
+import Layout from './Components/Layout.jsx';
+import Budget from './Pages/Budget.jsx';
 
 
 const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <Layout/>,
+      element: <LandingPage/>,
       errorElement: <NotFoundPage/>
     },
     {
@@ -41,6 +44,24 @@ const router = createBrowserRouter(
     {
       path: '/createCompany',
       element: <CreateCompany/>,
+      errorElement: <NotFoundPage/>
+    },
+    {
+      path: '/dashboard',
+      element: (
+        <Layout>
+          <Dashboard />
+        </Layout>
+      ),
+      errorElement: <NotFoundPage/>
+    },
+    {
+      path: '/budget',
+      element: (
+        <Layout>
+         <Budget/>
+        </Layout>
+      ),
       errorElement: <NotFoundPage/>
     }
   ]
