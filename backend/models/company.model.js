@@ -7,6 +7,8 @@ const companySchema = new mongoose.Schema({
   budgets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Budget" }],
   expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
   employees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  category: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
+
 }, { timestamps: true });
 
 

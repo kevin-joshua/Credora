@@ -18,11 +18,4 @@ router.put("/update/:expenseId", authMiddleware, updateExpense);
 router.delete("/delete/:expenseId",authMiddleware,  deleteExpense);
 router.post("/create", authMiddleware, createExpense);
 
-
-router.get("/company/:companyId", adminAuth, getCompanyExpenses);
-router.get("/:expenseId", adminAuth, getExpenseById);
-router.put("/update/:expenseId", adminAuth, updateExpense);
-router.delete("/delete/:expenseId",adminAuth,  deleteExpense);
-router.post("/create", adminAuth, createExpense);
-
 export default router;

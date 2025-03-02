@@ -44,6 +44,8 @@ app.set('case sensitive routing', false);
 
 
 
+
+
 // Routes
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/employee", userRoutes);
@@ -66,7 +68,7 @@ app.use("/api/v1/wolfram", wolframRoutes);
 })();
 
 
-app.get("/api/v1/employee/protected", (req, res) => {
+app.get("/api/v1/protected", (req, res) => {
   const token = req.cookies.token;
 
   if(!token){
@@ -81,18 +83,5 @@ app.get("/api/v1/employee/protected", (req, res) => {
   }
 })
 
-app.get("/api/v1/admin/protected", (req, res) => {
-  const token = req.cookies.token; // Ensure backend sets cookie as `jwt`
 
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_ADMIN);
-    return res.json({ message: "Protected data", user: decoded });
-  } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-});
 

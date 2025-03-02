@@ -1,7 +1,8 @@
 import { Router } from "express";
-import {adminAuth} from '../middleware/adminAuth.middleware.js'
-import {  registerAdmin, loginAdmin, updateAdmin, getAdminProfile } from "../controllers/user.controller.js";
 
+import {  registerAdmin, loginAdmin, updateAdmin, getAdminProfile } from "../controllers/user.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import { roleMiddleware } from "../middleware/role.middleware.js";
 const router = Router();
 
 
@@ -13,8 +14,8 @@ router.post("/login", loginAdmin);
 
 //protected admin routes
 
-router.put("/update/:adminId", adminAuth, updateAdmin);
-router.get("/profile/:adminId", adminAuth, getAdminProfile);
+router.put("/update/:adminId", authMiddleware, roleMiddleware, updateAdmin);
+router.get("/profile/:adminId", authMiddleware, roleMiddleware, getAdminProfile);
 
 
 export default router;

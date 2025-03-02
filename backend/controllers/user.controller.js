@@ -29,14 +29,18 @@ export const registerAdmin = async (req, res) => {
 
 
 export const loginAdmin = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, type } = req.body;
 
   try {
     const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    const token = await generateAdminToken(user._id);
+
+    console.log("type",type);
+    console.log("role", user.role)
+    if(type == user.role.toLowerCase()){
+    const token = await generateToken(user._id);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -46,6 +50,9 @@ export const loginAdmin = async (req, res) => {
     });
    
     res.status(201).json({ message: "Login successfull", user: user});
+  }else{
+    res.status(401).json({message: `${type} not found`})
+  }
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
   }
@@ -122,25 +129,33 @@ export const registerUser = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, type } = req.body;
 
   try {
     const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    const token = await generateToken(user._id);
+
+    console.log("type",type);
+    console.log("role", user.role)
+    if(type == user.role.toLowerCase()){
+      const token = await generateToken(user._id);
 
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
-      sameSite: "strict", // Protects against CSRF
-      maxAge: 24 * 60 * 60 * 1000, // 1 day expiry
-    });
-
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+        sameSite: "strict", // Protects against CSRF
+        maxAge: 24 * 60 * 60 * 1000, // 1 day expiry
+      });
+  
+      
+      res.status(201).json({ message: "Login successfull", user: user});
+    }else{
+      res.status(401).json({message: `${type} not found`})
+    }
     
-    res.status(201).json({ message: "Login successfull", user: user});
   } catch (error) {
     res.status(500).json({ error: "Login failed" });
   }

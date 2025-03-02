@@ -83,10 +83,12 @@ export const deleteCompany = async (req, res) => {
     res.status(500).json({ message: "Error deleting company", error: error.message });
   }
 };
-
+ 
 export const getCompanyById = async (req, res) => {
+  
   try{
-    const company = await Company.findById(req.params.id).populate("budgets expenses employees");
+   
+    const company = await Company.findById(req.params.id).populate("expenses budgets employees")
 
     if(!company){
       return res.status(404).json({message : "Company not found"});
