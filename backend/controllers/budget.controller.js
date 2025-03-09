@@ -117,7 +117,7 @@ export const deleteBudget = async (req, res) => {
     await Category.findByIdAndUpdate(budget.category, {
       $pull: { budgets: budgetId },
     });
-
+ 
     res.status(201).json({ message: "Budget deleted" });
   }
   catch(error){

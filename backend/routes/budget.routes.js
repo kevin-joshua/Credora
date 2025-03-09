@@ -10,9 +10,13 @@ import {
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
 
-
+  
 const router = express.Router();
 
+router.use((req, res, next) => {
+  console.log("Incoming request to:", req.originalUrl);
+  next();
+}); 
 
 router.post("/create", authMiddleware, roleMiddleware, createBudget);
 router.get("/company/:companyId",authMiddleware,  getCompanyBudgets);

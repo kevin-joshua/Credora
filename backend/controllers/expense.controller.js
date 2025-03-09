@@ -1,11 +1,13 @@
 import Expense from "../models/expense.model.js";
 import Company from "../models/company.model.js";
 import Category from "../models/category.model.js";
+import { json } from "express";
+import mongoose from "mongoose";
 
 // Create Expense
 export const createExpense = async (req, res) => {
   try {
-    const { companyId, categoryId, amount, description } = req.body;
+    const { companyId, categoryId, amount, name, period } = req.body;
     console.log(companyId);
     // Check if company exists
     const company = await Company.findById(companyId);
@@ -14,15 +16,13 @@ export const createExpense = async (req, res) => {
     if (!category ) return res.status(404).json({ message: "Category not found" });
 
     // Create new expense
-    const expense = new Expense({ company: companyId, category: categoryId, amount, description });
+    const expense = new Expense({ company: companyId, category: categoryId, amount, name, period });
     await expense.save();
 
     // Link expense to company
     company.expenses.push(expense._id);
     await company.save();
 
-    category.expenses.push(expense._id);
-    await category.save();
 
 
     res.status(201).json({ message: "Expense created successfully", _id: expense._id });
@@ -33,12 +33,14 @@ export const createExpense = async (req, res) => {
 
 // Get Expenses for a Company
 export const getCompanyExpenses = async (req, res) => {
+  console.log("hello")
   try {
     const { companyId } = req.params;
     console.log(companyId);
     const expenses = await Expense.find({ company: companyId });
-
-    res.status(200).json(expenses);
+    if(!expenses) return res.status(404).json({message: "expense not found"});
+    console.log(expenses)
+    res.status(201).json(expenses);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -53,7 +55,7 @@ export const getExpenseById = async (req, res) => {
     const expense = await Expense.findById(expenseId); // ✅ Use findById() instead of find()
     if (!expense) return res.status(404).json({ message: "Expense not found" })
 
-    res.status(200).json(expense);
+    res.status(201).json(expense);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -63,7 +65,7 @@ export const getExpenseById = async (req, res) => {
 export const updateExpense = async (req, res) => {
   try {
     const { expenseId } = req.params;
-    const { amount, description, categoryId } = req.body;
+    const { amount, name, categoryId } = req.body;
     const expense = await Expense.findById(expenseId);
     if (!expense) return res.status(404).json({ message: "Expense not found" });
     
@@ -89,7 +91,7 @@ if (categoryId) {
 }
 
   expense.amount = amount;
-  expense.description = description;
+  expense.name = name;
 
   await expense.save();
 
@@ -116,8 +118,59 @@ export const deleteExpense = async (req, res) => {
       $pull: { expenses: expenseId },
     });
 
-    res.status(200).json({ message: "Expense deleted" });
+    res.status(201).json({ message: "Expense deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+const getExpensesByPeriod = async (req, res) => {
+  console.log("hello")
+  try{
+ 
+  const {company, month, year} = req.query;
+  
+  const matchStage = {
+    company : new mongoose.Types.ObjectId(company),
+    "period.year" : parseInt(year),
+  }
+
+  if(month) matchStage["period.month"] = parseInt(month);
+  console.log("match stage:",matchStage)
+   
+
+
+  const expense = await Expense.aggregate([
+    {$match : matchStage},
+    {
+      $lookup : {
+        from : "categories",
+        localField : "category",
+        foreignField : "_id",
+        as : "categoryDetails"
+      },
+    },
+    {
+      $unwind : "$categoryDetails"
+    },
+    {
+      $group : {
+        _id : null,
+        totalAmount : {$sum : "$amount"},
+        expense: { $push : "$$ROOT" }
+      }
+    }
+  ])
+  if(!expense) return res.status(400).json({message: "Error"})
+  console.log("expensesfetched", expense.u);
+  res.status(201).json(expense);
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).json({message: "Server Error"})
+  }
+  
+}
+
+export {getExpensesByPeriod}

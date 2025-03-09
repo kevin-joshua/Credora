@@ -11,6 +11,8 @@ import budgetRoutes from './routes/budget.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import wolframRoutes from './routes/wolfram.routes.js';
+import revenueRoutes from './routes/revenue.routes.js';
+import invoiceRoutes from './routes/invoice.routes.js';
 const PORT = process.env.PORT;
 const clientUrl = process.env.CLIENT_URL;
 
@@ -54,6 +56,9 @@ app.use("/api/v1/expense", expenseRoutes);
 app.use("/api/v1/budget", budgetRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/wolfram", wolframRoutes);
+app.use("/api/v1/revenue", revenueRoutes);
+app.use("/api/v1/invoice", invoiceRoutes);
+
 
 
 // app.use("/api/wolfram", wolframRoutes);

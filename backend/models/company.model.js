@@ -8,7 +8,8 @@ const companySchema = new mongoose.Schema({
   expenses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Expense" }],
   employees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   category: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
-
+  revenue: [{ type: mongoose.Schema.Types.ObjectId, ref: "Revenue" }], 
+  invoice: [{type: mongoose.Schema.Types.ObjectId, ref: "Revenue"}],
 }, { timestamps: true });
 
 
