@@ -1,47 +1,45 @@
-import axios from "axios"
-import { useAuth } from "../Context/AuthContext";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import Loader from "../Components/Loader";
-import { useNavigate } from "react-router-dom";
 
-
+import axios from 'axios';
+import { useAuth } from '../Context/AuthContext'
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import Loader from '../Components/Loader.jsx'
+import { useForm } from 'react-hook-form';
+import ExpenseChart from '../Components/ExpenseChart.jsx';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const Budget = () => {
-  const {company, user} = useAuth();
-  const [budget, setBudget] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(false);
-  
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
-  const [annualView, setAnnualView] = useState(false);
-  const [totalAmount, setTotalAmount] = useState(0);
- 
-
-  const {handleSubmit, register, watch, formState: {errors}, setValue} = useForm();
-
+const Expense = () => {
+  const {user, company} = useAuth();
   const navigate = useNavigate();
 
+  const [expense, setExpense] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [error, setError] = useState();
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const [totalAmount, setTotalAmount] = useState();
+  const [annualView, setAnnualView] = useState(true);
+
+
+  const {register, handleSubmit,watch, formState : {errors}, setValue} = useForm();
+  const selectedType = watch("type");
+  
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => currentYear + i);
 
-   
-  const selectedType = watch("type");
-
-  const fetchBudget = async() => {
+  const fetchExpense = async() => {
+    console.log("hello")
     try {
       setLoading(!loading)
-      const response = await axios.get(`${BASE_URL}/budget/budgets?company=${company}&month=${month}&year=${year}`, 
+      const response = await axios.get(`${BASE_URL}/expense/hi/expenses?company=${company}&month=${month}&year=${year}`, 
         { withCredentials: true })
-        console.log("fetch budget called:",response)
+        console.log("fetch expense called:",response)
         if(response.status === 201){
           console.log(response.data[0])
-          setBudget(response.data[0].budgets);
+          setExpense(response.data[0].expense);
           setTotalAmount(response.data[0].totalAmount);
         }
     } catch (error) {
@@ -52,24 +50,24 @@ const Budget = () => {
     
       
   }
-  const fetchCategory = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/category/all/${company}`, {withCredentials: true});
-    console.log("category:",response.data);
-    console.log(category.length)
-    setCategory(response.data)
-    } catch (error) {
-      console.log("Error fetching company", error.message)
-    }
-    
-    finally{
-        setLoading(false)
-    }
-  }
 
-  const onSubmit = async (data) => {
- 
-    try{
+  const fetchCategory = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/category/all/${company}`, {withCredentials: true});
+      console.log("category:",response.data);
+      console.log(category.length)
+      setCategory(response.data)
+      } catch (error) {
+        console.log("Error fetching company", error.message)
+      }
+      
+      finally{
+          setLoading(false)
+      }
+    }
+
+
+    const onSubmit = async (data) => {
       const requestedData = {
         companyId : company,
         categoryId: data.category,
@@ -80,66 +78,66 @@ const Budget = () => {
           ...(data.type === "monthly" && { month: data.month }) // Include month only if type is "monthly"
         }
       };
-      console.log(requestedData)
-      const response = await axios.post(`${BASE_URL}/budget/create`, requestedData, {withCredentials: true})
-      if(response.status == 201){
-        console.log("created");
-        fetchBudget();
-        setMonth("");
-        setYear("");
-      }
-      else if(response.status == 404){
-        setError(response.message);
-      }
-      else if(response.status == 500){
-        setError("Error creating company");
-      }
+      try{
+        const response = await axios.post(`${BASE_URL}/expense/create`, requestedData, {withCredentials: true})
+        console.log(response);
+        if(response.status == 201){
+          console.log("success");
+          setModal(!modal)
+          fetchExpense();
+        }else if(response.status == 404){
+          setError(response.message);
+        }
+        else if(response.status == 500){
+          setError("Error creating company");
+        }
+      }catch(error){
+        console.log(error);
+      }  
     }
-    catch(error){
-      console.log(error.stack);
-    }
-    finally{
-      setModal(false)
-    }
-  }
- 
-  const deleteBudget = async (budgetId) => {
+
+  const deleteExpense = async (expenseId) => {
     try{
-      const response = await axios.delete(`${BASE_URL}/budget/delete/${budgetId}`, {withCredentials : true});
+    const response = await axios.delete(`${BASE_URL}/expense/delete/${expenseId}`, {withCredentials: true});
 
-      if(response.status == 201){
-        console.log("Deleted Successfully");
-        fetchBudget();
-      }
-    }catch(error){
-      console.log("Error deleting", error.stack);
-
+    if(response.status == 201){
+      console.log("Deleted Successfully");
+      fetchExpense();
     }
+  }catch(error){
+    console.log("Error deleting", error.stack);
+
+  }
   }
 
   useEffect(() => {
-   if(!user){
-    navigate("/login")
-   }
+    if(!user){
+      navigate("/login")
+    }
     fetchCategory();
-    fetchBudget();
+    fetchExpense();
   },[])
 
   useEffect(() => {
-    fetchBudget();
+    fetchExpense();
+    setExpense([]);
   }, [month, year])
 
   useEffect(() => {
     setMonth("");
     setYear("");
-    setBudget([]);
+    setExpense([]);
+    
   }, [annualView])
+
+
   return (
     <div>
-      {!loading ? (<div className="p-8 flex flex-col justify-center space-y-8 min-w-2xl">
-      {(
-        <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold ml-2">Budget Analysis</h2>
+    {!loading ? 
+    (
+    <div className="p-8 flex flex-col justify-center space-y-8 min-w-2xl">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold ml-2">Expense Analysis</h2>
         <div className="space-x-3">
         <button
           className="p-2 bg-indigo-400 hover:bg-indigo-500 rounded-lg min-w-32 text-base text-white"
@@ -153,38 +151,35 @@ const Budget = () => {
         >
           {annualView ? "Switch to Monthly View" : "Switch to Annual View" }
         </button>
-      </div>
-      </div>
-        )}
-      {(<div>
-      
-        {modal && (
+        </div>
+    </div>
+    {modal && (
           <div className="fixed inset-0 flex items-center justify-center top-42 bg-white bg-opacity-10 z-50">
           <div className="bg-white shadow-2xl rounded-xl p-6 max-w-md w-full">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Create Budget</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Create expense</h2>
         
             {error && <p className="text-red-500 text-center">{error}</p>}
-  {/* Budget Category Selection */}
+  {/*  Expense Selection */}
   <form onSubmit={handleSubmit(onSubmit)}>
   <div className="mb-4">
-    <label className="block text-lg font-medium mb-2">Budget Category</label>
+    <label className="block text-lg font-medium mb-2">Expense Category</label>
     <select {...register("category",{
       required: "Category is required"
     })} className="w-full border rounded-md border-indigo-500 p-2" defaultValue="">
-      <option value="" disabled>Select Category</option>
+      <option value="" disabled>Select Expense</option>
       {category.map((cat, index) => (
         <option key={index} value={cat._id}>{cat.name}</option>
       ))}
     </select>
-    <p className="text-red-500">{errors.category?.message}</p>
+    <p className="text-red-500">{errors.expense?.message}</p>
   </div>
 
-  {/* Budget Type Selection */}
+  {/* expense Type Selection */}
   <div className="mb-4">
-    <label className="block text-lg font-medium mb-2">Budget Type</label>
+    <label className="block text-lg font-medium mb-2">expense Type</label>
     <select {...register("type",{
       required: "Type is required"
-    })} className="w-full border rounded-md border-indigo-500 p-2" id="budgetType" defaultValue={"monthly"}>
+    })} className="w-full border rounded-md border-indigo-500 p-2" id="expenseType" defaultValue={"monthly"}>
       <option value="monthly">Monthly</option>
       <option value="annual">Annual</option>
     </select>
@@ -247,19 +242,20 @@ const Budget = () => {
   </button>
   </form>  
   </div>
+
+
   </div>
 )}
 
-<div className="p-4 text-center">
-{console.log("budgets:", budget)}
-{console.log("budgets:", totalAmount)}
+
+<div className="p-4 text-center grid grid-cols-2 gap-12 items-center justify-between">
 
   {!annualView ? ( 
-     
+
      <ul className="bg-white shadow-xl shadow-gray-400 rounded-lg p-4">
       <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md mb-6">
   {/* Title on the left */}
-  <h2 className="text-xl font-semibold">Monthly Budgets</h2>
+  <h2 className="text-xl font-semibold mr-3">Monthly expenses</h2>
 
   {/* Dropdowns on the right */}
   <div className="flex items-center space-x-4">
@@ -295,8 +291,8 @@ const Budget = () => {
     </select>
   </div>
 </div>
-      {console.log(budget.length)}
-       {budget.length > 0 ? (
+      {console.log(expense.length)}
+       {expense.length > 0 ? (
          <div className="mb-8 ">
           <div className="grid grid-cols-3 gap-4 bg-gray-100 p-3 font-semibold text-gray-600 rounded-lg">
           <div>Title</div>
@@ -304,13 +300,13 @@ const Budget = () => {
           <div>Period</div>
         </div>
   
-          {/* Budget Data */}
+          {/* expense Data */}
           
-     {budget.map((budget, index) => (
+     {expense.map((expense, index) => (
        <div key={index} className="grid grid-cols-3 gap-4 p-3 border-b items-center border-b-indigo-400">
-         <div>{budget.categoryDetails.name}</div>
-         <div>${budget.amount}</div>
-         <div>{months[budget.period.month-1 ]}, {budget.period.year} <button onClick={(e) => {deleteBudget(budget._id)}} className="hover:bg-black ml-6 p-2 hover:text-red-600 rounded-lg"><i className="fa fa-trash"></i></button></div>
+         <div>{expense.categoryDetails.name}</div>
+         <div>${expense.amount}</div>
+         <div>{months[expense.period.month-1 ]}, {expense.period.year} <button onClick={(e) => {deleteExpense(expense._id)}} className="hover:bg-black ml-6 p-2 hover:text-red-600 rounded-lg"><i className="fa fa-trash"></i></button></div>
        </div>
      ))}
 
@@ -326,14 +322,16 @@ const Budget = () => {
        
            )
         : (
-         <p className="text-gray-500">{ year == "" ? "Select month and year to proceed" : "No Monthly Budgets Available"}</p>
+         <p className="text-gray-500">{ year == "" ? "Select month and year to proceed" : "No Monthly expenses Available"}</p>
        )}
-     </ul> ) : 
+     </ul> 
+     
+    ) : 
      ( 
       <ul className="bg-white shadow-xl shadow-gray-400 rounded-lg p-4">
       <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md mb-6">
   {/* Title on the left */}
-  <h2 className="text-xl font-semibold">Annual Budgets</h2>
+  <h2 className="text-xl font-semibold mr-3">Annual expenses</h2>
 
   {/* Dropdowns on the right */}
   <div className="flex items-center space-x-4">
@@ -354,7 +352,7 @@ const Budget = () => {
     </select>
   </div>
 </div>
-        {budget.length > 0 ? (
+        {expense.length > 0 ? (
           <div className="mb-8 ">
            <div className="grid grid-cols-3 gap-4 bg-gray-100 p-3 font-semibold text-gray-600 rounded-lg">
            <div>Title</div>
@@ -362,13 +360,13 @@ const Budget = () => {
            <div>Period</div>
          </div>
    
-           {/* Budget Data */}
+           {/* expense Data */}
            
-      {budget.map((budget, index) => (
+      {expense.map((expense, index) => (
         <div key={index} className="grid grid-cols-3 gap-4 p-3 border-b items-center border-b-indigo-400">
-          <div>{budget.categoryDetails.name}</div>
-          <div>${budget.amount}</div>
-          <div>{budget.period.year} <button onClick={(e) => {deleteBudget(budget._id)}} className="hover:bg-black ml-6 p-2 hover:text-red-600 rounded-lg"><i className="fa fa-trash"></i></button></div>
+          <div>{expense.categoryDetails.name}</div>
+          <div>${expense.amount}</div>
+          <div>{expense.period.year} <button onClick={(e) => {deleteExpense(expense._id)}} className="hover:bg-black ml-6 p-2 hover:text-red-600 rounded-lg"><i className="fa fa-trash"></i></button></div>
 
           
 
@@ -385,22 +383,21 @@ const Budget = () => {
         
             )
          : (
-          <p className="text-gray-500">{ year == "" ? "Select year to proceed" : "No Monthly Budgets Available"}</p>
+          <p className="text-gray-500">{ year == "" ? "Select year to proceed" : "No Monthly expenses Available"}</p>
         )}
       </ul>)}
       
-
-      
-    </div>
-        </div>)
-      }
-    </div>) : ( 
-      <Loader/>
-    )}
     
-      
+      <ExpenseChart companyId={company} annualView={annualView} expense={expense} totalAmount={totalAmount}/>
+    </div>
+
+
+    </div>
+
+        
+  ) : (<Loader/>)}
     </div>
   )
 }
 
-export default Budget
+export default Expense
