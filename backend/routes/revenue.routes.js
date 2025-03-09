@@ -9,6 +9,11 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  console.log("Incoming request to:", req.originalUrl);
+  next();
+}); 
+
 // 🔹 Create Revenue and Add to Company
 router.post("/create", authMiddleware, createRevenue);
 
@@ -19,3 +24,4 @@ router.get("/revenues", authMiddleware, getRevenueByPeriod);
 router.delete("/delete/:id", authMiddleware, deleteRevenue);
 
 export default router;
+ 

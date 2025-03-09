@@ -12,6 +12,10 @@ import Dashboard from './Pages/Dashboard.jsx';
 import LandingPage from './Pages/LandingPage.jsx';
 import Layout from './Components/Layout.jsx';
 import Budget from './Pages/Budget.jsx';
+import Expense from './Pages/Expense.jsx';
+import RevenuePage from './Pages/RevenuePage.jsx';
+import InvoicePage from './Pages/InvoicePage.jsx';
+import ReportPage from './Pages/ReportPage.jsx';
 
 
 const router = createBrowserRouter(
@@ -60,6 +64,42 @@ const router = createBrowserRouter(
       element: (
         <Layout>
          <Budget/>
+        </Layout>
+      ),
+      errorElement: <NotFoundPage/>
+    },
+    {
+      path: '/expenses',
+      element: (
+        <Layout>
+         <Expense/>
+        </Layout>
+      ),
+      errorElement: <NotFoundPage/>
+    },
+    {
+      path: '/revenue',
+      element: (
+        <Layout>
+         <RevenuePage/>
+        </Layout>
+      ),
+      errorElement: <NotFoundPage/>
+    },
+    {
+      path: '/invoices',
+      element: (
+        <Layout>
+         <InvoicePage/>
+        </Layout>
+      ),
+      errorElement: <NotFoundPage/>
+    },
+    {
+      path: '/reports',
+      element: (
+        <Layout>
+         <ReportPage/>
         </Layout>
       ),
       errorElement: <NotFoundPage/>

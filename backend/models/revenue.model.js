@@ -30,7 +30,6 @@ const revenueSchema = new mongoose.Schema({
       type: Number,
       min: 1,
       max: 12,
-      required: true,
     },
     year: {
       type: Number,

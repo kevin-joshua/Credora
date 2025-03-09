@@ -35,7 +35,7 @@ export const getCategories = async (req, res) => {
   const {companyId} = req.params;
   try {
     const categories = await Category.find({company : companyId});
-    const category = categories.map(category => ({_id: category._id, name: category.name}))
+    const category = categories.map(category => ({_id: category._id, name: category.name, expense: category.expenses, budget: category.budgets}))
     console.log(category)
     res.status(200).json(category);
   } catch (error) {
