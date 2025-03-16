@@ -1,11 +1,9 @@
 import React, {useState, useEffect} from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import axios from "axios";
-import Company from "../../../backend/models/company.model";
-import Loader from "./Loader";
+
 import PropTypes from "prop-types"; // Import PropTypes
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 
 const ExpenseChart = (props) => {
   const {companyId, annualView, expense, totalAmount} = props;
